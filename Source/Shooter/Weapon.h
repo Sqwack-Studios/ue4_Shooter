@@ -4,7 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Item.h"
+#include "AmmoType.h"
 #include "Weapon.generated.h"
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	EWT_SubmachineGun UMETA(DisplayName = "SubmachineGun"),
+	EWT_AssaultRifle UMETA(DisplayName = "AssaultRifle"),
+
+	EWT_MAX UMETA(DisplayName = "DefaultMAX")
+
+};
 
 /**
  * 
@@ -35,6 +46,17 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
 	int32 Ammo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
+	EWeaponType WeaponType;
+
+	/** The type of ammo for this weapon*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
+	EAmmoType AmmoType;
+
+	/** FName for the Reload Montage Section*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
+	FName ReloadMontageSection;
+
 public:
 
 	/** Adds an impulse to the weapon  */
@@ -44,4 +66,8 @@ public:
 
 	/** Called from Character Class when fired Weapon*/
 	void DecrementAmmo();
+
+	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; };
+	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; };
+	FORCEINLINE FName GetReloadMontageSection() const { return ReloadMontageSection; };
 };
