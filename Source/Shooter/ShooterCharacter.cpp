@@ -93,6 +93,8 @@ AShooterCharacter::AShooterCharacter() :
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
+	HandSceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("HandSceneComp"));
+
 }
 
 // Called when the game starts or when spawned
@@ -734,8 +736,33 @@ void AShooterCharacter::ReloadWeapon()
 void AShooterCharacter::FinishReloading()
 {
 	//TODO: Update AmmoMap
-
+	//Update combat state
 	CombatState = ECombatState::ECS_Unoccupied;
+
+	if (EquippedWeapon == nullptr) return; 
+	//Update ammo map
+	const auto AmmoType = EquippedWeapon->GetAmmoType();
+	if (AmmoMap.Contains(AmmoType))
+	{
+		//Amount of ammo the Character is carrying of the EquippedWeapon type
+		int32 CarriedAmmo = AmmoMap[AmmoType];
+
+		const int32 MagEmptySpace = EquippedWeapon->GetMagazineCapacity() - EquippedWeapon->GetAmmo();
+
+		if (MagEmptySpace > CarriedAmmo)
+		{
+			//Reload the magazine with all the ammo we are carrying
+			EquippedWeapon->ReloadAmmo(CarriedAmmo);
+			CarriedAmmo = 0;
+		}
+		else
+		{
+			//fill the magazine
+			EquippedWeapon->ReloadAmmo(MagEmptySpace);
+			CarriedAmmo -= MagEmptySpace;
+		}
+		AmmoMap.Add(AmmoType, CarriedAmmo); 
+	}
 }
 
 bool AShooterCharacter::CarryingAmmo()
@@ -750,4 +777,27 @@ bool AShooterCharacter::CarryingAmmo()
 	}
 
 	return false;
+}
+
+void AShooterCharacter::GrabClip()
+{
+	if (EquippedWeapon == nullptr) return;
+	//Index for the clip bone on the EquippedWeapon
+	int32 ClipBoneIndex{ EquippedWeapon->GetItemMesh()->GetBoneIndex(EquippedWeapon->GetClipBoneName()) };
+
+	//Store the transform of the clip at the beginning of the reload animation
+	ClipTransform = EquippedWeapon->GetItemMesh()->GetBoneTransform(ClipBoneIndex);
+
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepRelative, true);
+	HandSceneComponent->AttachToComponent(GetMesh(), AttachmentRules, FName{ TEXT("Hand_L") });
+	HandSceneComponent->SetWorldTransform(ClipTransform);
+	
+	EquippedWeapon->SetMovingClip(true);
+
+}
+
+void AShooterCharacter::ReplaceClip()
+{
+	//
+	EquippedWeapon->SetMovingClip(false);
 }

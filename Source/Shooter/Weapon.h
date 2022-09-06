@@ -30,6 +30,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+
 protected:
 
 	
@@ -46,6 +47,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
 	int32 Ammo;
 
+	/** Maximum ammo that our weapon can hold*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
+	int32 MagazineCapacity;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
 	EWeaponType WeaponType;
 
@@ -57,12 +62,20 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
 	FName ReloadMontageSection;
 
+	/** True when moving the clip while reloading*/
+	bool bMovingClip;
+
+	/** Name for the clip bone*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties", meta = (AllowPrivateAccess = "true"))
+	FName ClipBoneName;
+
 public:
 
 	/** Adds an impulse to the weapon  */
 	void ThrowWeapon();
 
 	FORCEINLINE int32 GetAmmo() const { return Ammo; };
+	FORCEINLINE int32 GetMagazineCapacity() const { return MagazineCapacity; };
 
 	/** Called from Character Class when fired Weapon*/
 	void DecrementAmmo();
@@ -70,4 +83,9 @@ public:
 	FORCEINLINE EWeaponType GetWeaponType() const { return WeaponType; };
 	FORCEINLINE EAmmoType GetAmmoType() const { return AmmoType; };
 	FORCEINLINE FName GetReloadMontageSection() const { return ReloadMontageSection; };
+	FORCEINLINE FName GetClipBoneName() const { return ClipBoneName; };
+
+	void ReloadAmmo(int32 Amount);
+
+	FORCEINLINE void SetMovingClip(bool Move) { bMovingClip = Move; };
 };
