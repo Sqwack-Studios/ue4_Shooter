@@ -781,7 +781,7 @@ bool AShooterCharacter::CarryingAmmo()
 
 void AShooterCharacter::GrabClip()
 {
-	if (EquippedWeapon == nullptr) return;
+	if (EquippedWeapon == nullptr || HandSceneComponent == nullptr) return;
 	//Index for the clip bone on the EquippedWeapon
 	int32 ClipBoneIndex{ EquippedWeapon->GetItemMesh()->GetBoneIndex(EquippedWeapon->GetClipBoneName()) };
 
